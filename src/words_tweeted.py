@@ -10,10 +10,11 @@ BASE_DIR = './../'
 TWEET_INPUT_DIR = 'tweet_input/'
 TWEET_OUTPUT_DIR = 'tweet_output/'
 TWEET_DATA = 'tweets.txt'
-INPUT_FILE_PATH = BASE_DIR + TWEET_INPUT_DIR + TWEET_DATA
 OUTPUT_FILE_NAME = 'ft1.txt'
+INPUT_FILE_PATH = BASE_DIR + TWEET_INPUT_DIR + TWEET_DATA
 OUTPUT_FILE_PATH = BASE_DIR + TWEET_OUTPUT_DIR + OUTPUT_FILE_NAME
 PADDING = 28
+
 # First, read in all the tweets, one tweet at a time
 # For each tweet, tokenize it by separating on whitespace
 # For each word in each tweet, count up using defaultdict
@@ -21,9 +22,7 @@ with open(FILE_PATH) as input_f:
 	for tweet in input_f:
 		tokenized_tweet = tweet.split()
 		for word in tokenized_tweet:
-			print word
 			d[word] += 1
-		print '----next tweet-----'
 
 # Print the output of the defaultdict to a output file named ft1.txt
 # Since the default string comparison is based on Lexicographical order
