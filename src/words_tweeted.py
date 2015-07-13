@@ -1,7 +1,6 @@
 # Create a Defaultdict to store k,v pairs where
 # k = tokenized word
 # v = the number of times k appeared from the corpus
-import operator
 from collections import defaultdict
 d = defaultdict(int)
 
@@ -18,7 +17,7 @@ PADDING = 28
 # First, read in all the tweets, one tweet at a time
 # For each tweet, tokenize it by separating on whitespace
 # For each word in each tweet, count up using defaultdict
-with open(FILE_PATH) as input_f:
+with open(INPUT_FILE_PATH, 'r') as input_f:
 	for tweet in input_f:
 		tokenized_tweet = tweet.split()
 		for word in tokenized_tweet:
@@ -31,7 +30,7 @@ with open(FILE_PATH) as input_f:
 
 # Sort the keys in defaultdict by ASCII ordering
 # Write the output into ft
-with open (OUTPUT_FILE_PATH,'w') as output_f:
+with open (OUTPUT_FILE_PATH, 'w') as output_f:
 	sorted_keys = sorted(d)
 	for w in sorted_keys[:-1]:
 		output_f.write("{}{}\n".format(w.ljust(PADDING), d[w]))
