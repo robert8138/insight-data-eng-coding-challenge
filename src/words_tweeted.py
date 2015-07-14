@@ -1,27 +1,29 @@
-# Create a Defaultdict to store k,v pairs where
-# k = tokenized word
-# v = the number of times k appeared from the corpus
 from collections import defaultdict
-d = defaultdict(int)
-
-# Setup to read tweets.txt from the proper location
-BASE_DIR = './../'
-TWEET_INPUT_DIR = 'tweet_input/'
-TWEET_OUTPUT_DIR = 'tweet_output/'
-TWEET_DATA = 'tweets.txt'
-OUTPUT_FILE_NAME = 'ft1.txt'
-INPUT_FILE_PATH = BASE_DIR + TWEET_INPUT_DIR + TWEET_DATA
-OUTPUT_FILE_PATH = BASE_DIR + TWEET_OUTPUT_DIR + OUTPUT_FILE_NAME
-PADDING = 28
+import sys
 
 # First, read in all the tweets, one tweet at a time
 # For each tweet, tokenize it by separating on whitespace
 # For each word in each tweet, count up using defaultdict
-with open(INPUT_FILE_PATH, 'r') as input_f:
-	for tweet in input_f:
-		tokenized_tweet = tweet.split()
-		for word in tokenized_tweet:
-			d[word] += 1
+
+def generate_word_frequency(INPUT_PATH):
+	'''
+		generate_word_frequency process a file of tweets and generate word count
+		from the corpus
+
+		input: INPUT_PATH which is a string that represent the path to the data
+		output: a dictionary with k = token, v = frequency of occurrence of k
+	'''
+	# Create a Defaultdict to store k,v pairs where
+	# k = tokenized word
+	# v = the number of times k appeared from the corpus
+	d = defaultdict(int)
+	with open(INPUT_PATH, 'r') as tweets:
+		for tweet in tweets:
+			# Assume that the only delimiter is a white space
+			tokenized_tweet = tweet.split()
+			for word in tokenized_tweet:
+				d[word] += 1
+	return d
 
 # Print the output of the defaultdict to a output file named ft1.txt
 # Since the default string comparison is based on Lexicographical order
@@ -30,8 +32,27 @@ with open(INPUT_FILE_PATH, 'r') as input_f:
 
 # Sort the keys in defaultdict by ASCII ordering
 # Write the output into ft
-with open (OUTPUT_FILE_PATH, 'w') as output_f:
-	sorted_keys = sorted(d)
-	for w in sorted_keys[:-1]:
-		output_f.write("{}{}\n".format(w.ljust(PADDING), d[w]))
-	output_f.write("{}{}".format(sorted_keys[-1].ljust(PADDING), d[w]))
+
+def write_out_word_count(d, OUTPUT_PATH):
+	'''
+		write_out_word_count writes the word frequency according to Lexicographical order
+		input: d, a dictionary of work count
+		       OUTPUT_PATH, the output file path
+		output: NONE
+	'''
+	PADDING = 28
+	with open (OUTPUT_PATH, 'w') as output:
+		sorted_keys = sorted(d)
+		for w in sorted_keys[:-1]:
+			output.write("{}{}\n".format(w.ljust(PADDING), d[w]))
+		output.write("{}{}".format(sorted_keys[-1].ljust(PADDING), d[w]))
+
+def main():
+	INPUT_PATH = sys.argv[1]
+	OUTPUT_PATH = sys.argv[2]
+	word_count = generate_word_frequency(INPUT_PATH)
+	write_out_word_count(word_count, OUTPUT_PATH)
+
+
+if __name__ == '__main__':
+	main()
