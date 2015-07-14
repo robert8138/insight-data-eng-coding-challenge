@@ -2,44 +2,69 @@ from numpy import median
 from collections import defaultdict
 import sys
 
-# First, read in all the tweets, one tweet at a time
-# For each tweet, tokenize it by separating on whitespace
-# Then we want to count the number of unique tokens in each tweet
-def generate_unique_word_count(INPUT_PATH):
+def map_tweet_to_unique_wc(INPUT_PATH):
+	'''(string) -> defaultdict(set)
+
+	For each tweet in INPUT_PATH, tokenize the tweet and count the 
+	number of unique token using Functional programming style 
+	specifically, Map operation 
 	'''
-		generate_unique_word_count maps through the input file
-		for each tweet, generate the unique number of tokens from that tweet
-		Input: INPUT_PATH
-		Output: a list of unique token count
-	'''
-	# Create a Defaultdict to store k,v pairs where
-	# k = tokenized word
-	# v = the number of times k appeared from the corpus
-	d = defaultdict(set)
 	with open(INPUT_PATH, 'r') as tweets:
-		for line_num, tweet in enumerate(tweets):
-			tokenized_tweet = tweet.split()
-			for word in tokenized_tweet:
-				d[line_num].add(word)
+		return map(lambda tweet: len(set(tweet.split())), tweets)
 
-	# Calculate the unique number of tokens from each tweet using map
-	# funtional programming style for the win!
-	d_unique_count = map(lambda token_set: len(token_set), d.itervalues())
-	return d_unique_count
+def calculate_running_median(uniq_wc_list, OUTPUT_PATH):
+	'''(list, string) -> None
+	
+	Take one pass of the uniq_wc_list and compute running median
+	using a min-heap and a max-heap
+	'''
+	#pdb.set_trace()
+	running_median = []
+	first_count = uniq_wc_list.pop(0)
+	if uniq_wc_list:
+		second_count = uniq_wc_list.pop(0)
+		if first_count >= second_count:
+			min_heap = [first_count] # smaller than everything in this heap
+			max_heap = [-second_count] # larger than everything in this heap
+		else:
+			min_heap = [second_count]
+			max_heap = [-first_count]
+		running_median.append(first_count)
+		running_median.append(float(min_heap[0] - max_heap[0])/2)
+	else:
+		min_heap = [first_count]
+		running_median.append(first_count)
 
-def calculate_running_median(d_unique_count, OUTPUT_PATH):
-	'''
-		calculate_running_median process a list of unique count
-		and calculate the running median
-		input: d_unique_count, a list of count of unique token
-		       OUTPUT_PATH, output path we are writing to
-		output: None
-	'''
+	while uniq_wc_list:
+		# Process a new record
+		count = uniq_wc_list.pop(0)
+		if count >= min_heap[0]:
+			heapq.heappush(min_heap, count)
+		elif count < -max_heap[0]: 	
+			heapq.heappush(max_heap, -count)
+		else:
+			heapq.heappush(max_heap, -count)
+		# Rebalance the heap structures to be off by 1 element
+		if len(max_heap) - len(min_heap) > 1:
+			heapq.heappush(min_heap, -heapq.heappop(max_heap))
+		elif len(min_heap) - len(max_heap) > 1:
+			heapq.heappush(max_heap, -heapq.heappop(min_heap))
+
+		# Calculate Median
+		if len(max_heap) - len(min_heap) == 1:
+			running_median.append(-max_heap[0])
+		elif len(min_heap) - len(max_heap) == 1:
+			running_median.append(min_heap[0])
+		else:
+			running_median.append(float(-max_heap[0] + min_heap[0])/2)
+	#return running_median
+	
 	# Use list comprehension to calculate median 
 	# This is not efficient, we can do this in one pass
 	# Using one min heap and one max heap
-	running_medians = [median(d_unique_count[:i]) 
-							for i in range(1, len(d_unique_count)+1)]
+	#running_medians = [median(uniq_wc_list[:i]) for i in range(1, len(uniq_wc_list)+1)]
+	# [1.0, 2.0, 3.0, 17.5, 8.0, 19.5, 8.0, 19.5]
+
 	# Write out the running medians to OUTPUT_PATH
 	with open (OUTPUT_PATH, 'w') as output:
 		for med in running_medians[:-1]:
@@ -49,8 +74,8 @@ def calculate_running_median(d_unique_count, OUTPUT_PATH):
 def main():
 	INPUT_PATH = sys.argv[1]
 	OUTPUT_PATH = sys.argv[2]
-	uniq_word_count = generate_unique_word_count(INPUT_PATH)
-	calculate_running_median(uniq_word_count, OUTPUT_PATH)
+	uniq_wc_list = map_tweet_to_unique_wc(INPUT_PATH)
+	calculate_running_median(uniq_wc_list, OUTPUT_PATH)
 
 if __name__ == '__main__':
 	main()
