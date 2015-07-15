@@ -77,8 +77,6 @@ def calculate_running_median(uniq_wc_list, OUTPUT_PATH):
 		else:
 			running_medians.append(float(-max_heap[0] + min_heap[0])/2)
 	
-	#running_medians = [median(uniq_wc_list[:i]) for i in range(1, len(uniq_wc_list)+1)]
-
 	# Write out the running medians to OUTPUT_PATH
 	with open (OUTPUT_PATH, 'w') as output:
 		for median in running_medians[:-1]:
