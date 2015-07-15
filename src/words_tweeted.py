@@ -1,58 +1,47 @@
-from collections import defaultdict
-import sys
+## Author: Robert Chang
+## Purpose: Calculate the total number of times each word has been tweeted
+## Input: An input stream/file containing tweets
+## Output: An output of word, frequency pairs display in lexicographical order 
+## Assumptions: 
+## 		1. Each tweet can be tokenized by whitespace
+##      2. Each tweet has only lower case characters and regular ASCII characters
+##      3. The dictionary can be fit into memory
 
-# First, read in all the tweets, one tweet at a time
-# For each tweet, tokenize it by separating on whitespace
-# For each word in each tweet, count up using defaultdict
+import sys
+from collections import defaultdict
 
 def generate_word_frequency(INPUT_PATH):
-	'''
-		generate_word_frequency process a file of tweets and generate word count
-		from the corpus
+	'''(string) -> defaultdict(int)
 
-		input: INPUT_PATH which is a string that represent the path to the data
-		output: a dictionary with k = token, v = frequency of occurrence of k
+	For each tweet in INPUT_PATH, tokenize the tweet and tally up the word frequency
 	'''
-	# Create a Defaultdict to store k,v pairs where
-	# k = tokenized word
-	# v = the number of times k appeared from the corpus
 	d = defaultdict(int)
 	with open(INPUT_PATH, 'r') as tweets:
 		for tweet in tweets:
-			# Assume that the only delimiter is a white space
 			tokenized_tweet = tweet.split()
 			for word in tokenized_tweet:
 				d[word] += 1
 	return d
 
-# Print the output of the defaultdict to a output file named ft1.txt
-# Since the default string comparison is based on Lexicographical order
-# which uses ASCII ordering for individual characters
-# We can simply sort the keys of the defaultdict by the default string comparator
-
-# Sort the keys in defaultdict by ASCII ordering
-# Write the output into ft
-
-def write_out_word_count(d, OUTPUT_PATH):
+def write_word_frequency(d, OUTPUT_PATH):
+	'''(defaultdict(int), string) -> None 
+	
+	Output the frequency of word appearances in ASCII order
+	Since the default string comparison in Python is based on Lexicographical order
+	which uses ASCII ordering for individual characters, we can simply sort
+	the keys by using the default string comparator 
 	'''
-		write_out_word_count writes the word frequency according to Lexicographical order
-		input: d, a dictionary of work count
-		       OUTPUT_PATH, the output file path
-		output: NONE
-	'''
-	PADDING = 28
 	with open (OUTPUT_PATH, 'w') as output:
 		sorted_keys = sorted(d)
 		for w in sorted_keys[:-1]:
-			output.write("{}{}\n".format(w.ljust(PADDING), d[w]))
-		output.write("{}{}".format(sorted_keys[-1].ljust(PADDING), d[w]))
+			output.write("{}\t{}\n".format(w, d[w]))
+		output.write("{}\t{}".format(sorted_keys[-1], d[sorted_keys[-1]]))
 
 def main():
 	INPUT_PATH = sys.argv[1]
 	OUTPUT_PATH = sys.argv[2]
-	word_count = generate_word_frequency(INPUT_PATH)
-	write_out_word_count(word_count, OUTPUT_PATH)
-
+	word_frequencies = generate_word_frequency(INPUT_PATH)
+	write_word_frequency(word_frequencies, OUTPUT_PATH)
 
 if __name__ == '__main__':
 	main()
